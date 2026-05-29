@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RockUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+33388af220f75d04f443b8ca599d1c87f37c757b")]
 [assembly: System.Reflection.AssemblyProductAttribute("RockUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RockUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

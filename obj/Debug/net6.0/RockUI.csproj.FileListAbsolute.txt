@@ -230,3 +230,4 @@ C:\Data\Coding Projects\RockUI\obj\Debug\net6.0\RockUI.dll
 C:\Data\Coding Projects\RockUI\obj\Debug\net6.0\refint\RockUI.dll
 C:\Data\Coding Projects\RockUI\obj\Debug\net6.0\RockUI.pdb
 C:\Data\Coding Projects\RockUI\obj\Debug\net6.0\ref\RockUI.dll
+C:\Data\Coding Projects\RockUI\obj\Debug\net6.0\RockUI.sourcelink.json

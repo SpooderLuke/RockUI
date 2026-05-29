@@ -1,12 +1,15 @@
 ﻿using Harmony;
 using HarmonyLib;
 using Il2CppRUMBLE.Interactions.InteractionBase;
+using Il2CppRUMBLE.Players.Subsystems;
+using Il2CppRUMBLE.Slabs.Forms;
+using Il2CppRUMBLE.Slabs.States;
 using MelonLoader;
 using RumbleModdingAPI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Vector2 = UnityEngine.Vector2;
-[assembly: MelonInfo(typeof(RockUI.Main), "RockUI", "1.0.1", "SpooderCode")]
+[assembly: MelonInfo(typeof(RockUI.Main), "RockUI", "1.1.0", "SpooderCode")]
 [assembly: MelonGame(null, null)]
 [assembly: MelonColor(255,0,255,150)]
 namespace RockUI
@@ -25,11 +28,13 @@ namespace RockUI
                 {
                     RockUI.SliderPrefab = GameObject.Instantiate(RumbleModdingAPI.RMAPI.GameObjects.Gym.INTERACTABLES.MenuSlab.Content.Input.StickMovementDeadzone.Slider.GetGameObject());
                     GameObject.DontDestroyOnLoad(RockUI.SliderPrefab);
+                    RockUI.SliderPrefab.SetActive(false);
                 }
                 if (RockUI.LeverPrefab == null)
                 {
                     RockUI.LeverPrefab = GameObject.Instantiate(RumbleModdingAPI.RMAPI.GameObjects.Gym.INTERACTABLES.Howard.Howardsconsole.Interactebles.InteractionLever.GetGameObject());
                     GameObject.DontDestroyOnLoad(RockUI.LeverPrefab);
+                    RockUI.LeverPrefab.SetActive(false);
                 }
                 RockUI.panelMesh = RumbleModdingAPI.RMAPI.GameObjects.Gym.INTERACTABLES.MenuSlab.Content.Input.SnapRotationDeadzoneSetting.Mesh.GetGameObject().GetComponent<MeshFilter>().mesh;
                 RockUI.panelMat = RumbleModdingAPI.RMAPI.GameObjects.Gym.INTERACTABLES.MenuSlab.Content.Input.SnapRotationDeadzoneSetting.Mesh.GetGameObject().GetComponent<MeshRenderer>().material;
@@ -78,7 +83,7 @@ namespace RockUI
             mainpanel.AddChildUI(debugtext3);
             mainpanel.AddChildUI(debugslider);
 
-            GameObject debugmenu = RockUI.BuildUI(mainpanel);
+            GameObject debugmenu = RockUI.CreateFinalisedUI(mainpanel,true);
             debugmenu.transform.position = new Vector3(0, 1, 0);
         }
         private void log()
@@ -107,6 +112,53 @@ namespace RockUI
 
             public static Mesh panelMesh = null;
             public static Material panelMat = null;
+            public static GameObject CreateFinalisedUI(UIElement element, bool followPlayer)
+            {
+                GameObject g;
+                if (followPlayer)
+                {
+                    g = new GameObject();
+                    g.name = "RockUIFollowOffset";
+                    g.AddComponent<AutonomousTransform>().playerVR = RumbleModdingAPI.RMAPI.Calls.Players.GetLocalPlayerController().GetComponentInChildren<PlayerVR>();
+                    AutonomousBehaviour b = new AutonomousBehaviour();
+                    b.ControllerType = Il2CppRUMBLE.Players.ControllerType.Local;
+                    b.DistanceFromPlayerBody = 1;
+                    b.EnableRotationalControl = true;
+                    b.EndTime = 0.4167;
+                    b.Player = RumbleModdingAPI.RMAPI.Calls.Players.GetLocalPlayer();
+                    b.PlayerHeightFactor = 0.75f;
+                    b.DistanceFromPlayerBody = 0.75f;
+                    b.PositionSmoothnessMultiplier = 3;
+                    b.RotationSmoothnessMultiplier = 1;
+                    b.autonomousTransform = g.GetComponent<AutonomousTransform>();
+
+                    AnimationCurve curve1 = new AnimationCurve();
+                    curve1.AddKey(0, 0.3f);
+                    curve1.AddKey(1, 0.5f);
+
+                    AnimationCurve curve2 = new AnimationCurve();
+                    curve2.AddKey(0, 0f);
+                    curve2.AddKey(1, 1f);
+
+                    AnimationCurve curve3 = new AnimationCurve();
+                    curve3.AddKey(0, 0.3f);
+                    curve3.AddKey(1, 0.5f);
+
+                    b.PositionSmoothness = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<AnimationCurve>(new AnimationCurve[] { curve1, curve2, curve3 });
+                    b.RotationSmoothness = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<AnimationCurve>(new AnimationCurve[] { new AnimationCurve(), new AnimationCurve(), new AnimationCurve() });
+                    b.variablesDefined = true;
+                    g.GetComponent<AutonomousTransform>().Behaviour = b;
+                    GameObject ui = BuildUI(element);
+                    ui.transform.SetParent(g.transform, false);
+                    ui.transform.Rotate(0, 180, 0,Space.Self);
+                }
+                else
+                {
+                    g = BuildUI(element);
+                }
+                return g;
+            }
+
             public static GameObject BuildUI(UIElement uiElement, GameObject UIRoot = null, GameObject ParentObj = null, UIElement ParentUI = null)
             {
                 var g = uiElement.Create();
@@ -241,6 +293,7 @@ namespace RockUI
             public override GameObject Create()
             {
                 var g = GameObject.Instantiate(RockUI.SliderPrefab);
+                g.SetActive(true);
                 g.transform.rotation = Quaternion.identity;
                 g.transform.Rotate(90, 0, 180);
                 InteractionSlider s = g.transform.Find("Slider handle").GetComponent<InteractionSlider>();
@@ -265,6 +318,7 @@ namespace RockUI
             public override GameObject Create()
             {
                 var g = GameObject.Instantiate(RockUI.LeverPrefab);
+                g.SetActive(true);
                 g.transform.rotation = Quaternion.identity;
                 g.transform.Rotate(0, -90, 90);
                 InteractionLever s = g.transform.Find("ReferenceTransform/Lever").GetComponent<InteractionLever>();
